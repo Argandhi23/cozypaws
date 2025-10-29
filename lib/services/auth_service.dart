@@ -1,125 +1,127 @@
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class AuthService {
-  final String _usersKey = 'users';
   final String _currentUserKey = 'currentUser';
 
-  /// REGISTER USER
+  // 🔹 Ganti sesuai mode kamu jalankan Flutter
+  // Web         → http://localhost:3000/api
+  // Android     → http://10.0.2.2:3000/api
+  // HP Asli     → http://192.168.x.x:3000/api
+  final Dio _dio = Dio(BaseOptions(baseUrl: "http://localhost:3000/api"));
+
+  /// 🔹 REGISTER USER
   Future<void> register(String name, String email, String password) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final users = prefs.getStringList(_usersKey) ?? [];
-
-      // Validasi
       if (name.isEmpty || name.length < 3) {
         throw Exception('Nama minimal 3 karakter');
       }
-      if (email.isEmpty || !_isValidEmail(email)) {
+      if (!_isValidEmail(email)) {
         throw Exception('Gunakan email dengan format @gmail.com');
       }
-      if (password.isEmpty || password.length < 8) {
-        throw Exception('Password minimal 8 karakter');
+      if (password.isEmpty || password.length < 6) {
+        throw Exception('Password minimal 6 karakter');
       }
 
-      // Cek user sudah ada
-      final isExisting = await isUserExists(name, email);
-      if (isExisting) throw Exception('Nama atau Email sudah terdaftar');
+      final response = await _dio.post(
+        '/users',
+        data: {
+          'nama': name,
+          'email': email,
+          'password': password,
+        },
+      );
 
-      // Tambah user baru
-      final newUser = User(name: name, email: email, password: password);
-      users.add(newUser.encode());
-      await prefs.setStringList(_usersKey, users);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ Registrasi berhasil: ${response.data}');
+      } else {
+        throw Exception('Gagal registrasi (${response.statusCode})');
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Terjadi kesalahan koneksi server';
+      throw Exception(message);
     } catch (e) {
-      throw Exception('Registrasi gagal: ${e.toString()}');
+      throw Exception(e.toString());
     }
   }
 
-  /// LOGIN USER
+  /// 🔹 LOGIN USER
   Future<bool> login(String nameOrEmail, String password) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final users = prefs.getStringList(_usersKey) ?? [];
+      final response = await _dio.post(
+        '/auth/login',
+        data: {
+          'email': nameOrEmail,
+          'password': password,
+        },
+      );
 
-      for (var user in users) {
-        final userData = User.decode(user);
-        if ((userData.name == nameOrEmail || userData.email == nameOrEmail) &&
-            userData.password == password) {
-          await prefs.setString(_currentUserKey, userData.encode());
-          return true;
-        }
+      if (response.statusCode == 200) {
+        final userData = response.data['user'];
+        final prefs = await SharedPreferences.getInstance();
+
+        // Simpan user yang sedang login
+        final currentUser = User(
+          name: userData['nama'],
+          email: userData['email'],
+          password: userData['password'],
+        );
+
+        await prefs.setString(_currentUserKey, currentUser.encode());
+        return true;
+      } else {
+        return false;
       }
-      return false;
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Login gagal. Coba lagi.';
+      throw Exception(message);
     } catch (e) {
-      throw Exception('Login gagal: ${e.toString()}');
+      throw Exception(e.toString());
     }
   }
 
-  /// LOGOUT
+  /// 🔹 LOGOUT
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_currentUserKey);
   }
 
-  /// CEK USER ADA
-  Future<bool> isUserExists(String name, String email) async {
-    final prefs = await SharedPreferences.getInstance();
-    final users = prefs.getStringList(_usersKey) ?? [];
-    return users.any((user) {
-      final userData = User.decode(user);
-      return userData.name == name || userData.email == email;
-    });
-  }
-
-  /// GET CURRENT USER
+  /// 🔹 GET CURRENT USER
   Future<User?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
-    final currentUserData = prefs.getString(_currentUserKey);
-    if (currentUserData == null) return null;
-    return User.decode(currentUserData);
+    final data = prefs.getString(_currentUserKey);
+    if (data == null) return null;
+    return User.decode(data);
   }
 
-  /// GET ALL USERS
-  Future<List<User>> getAllUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final users = prefs.getStringList(_usersKey) ?? [];
-    return users.map((u) => User.decode(u)).toList();
-  }
-
-  /// RESET PASSWORD
+  /// 🔹 RESET PASSWORD
   Future<void> resetPassword(String email, String newPassword) async {
-    if (newPassword.isEmpty || newPassword.length < 8) {
-      throw Exception('Password minimal 8 karakter');
+    if (newPassword.isEmpty || newPassword.length < 6) {
+      throw Exception('Password minimal 6 karakter');
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    final users = prefs.getStringList(_usersKey) ?? [];
+    try {
+      final response = await _dio.put(
+        '/users/reset-password',
+        data: {
+          'email': email,
+          'newPassword': newPassword,
+        },
+      );
 
-    bool isUpdated = false;
-
-    for (int i = 0; i < users.length; i++) {
-      final userData = User.decode(users[i]);
-      if (userData.email == email) {
-        // Update password
-        final updatedUser = User(
-          name: userData.name,
-          email: userData.email,
-          password: newPassword,
-        );
-        users[i] = updatedUser.encode();
-        isUpdated = true;
-        break;
+      if (response.statusCode != 200) {
+        throw Exception('Gagal reset password');
       }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Gagal reset password';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception(e.toString());
     }
-
-    if (!isUpdated) {
-      throw Exception('Email tidak terdaftar');
-    }
-
-    await prefs.setStringList(_usersKey, users);
   }
 
-  /// VALIDASI EMAIL
+  /// 🔹 VALIDASI EMAIL
   bool _isValidEmail(String email) {
     final regex = RegExp(r'^[\w\.\-]+@gmail\.com$');
     return regex.hasMatch(email);
