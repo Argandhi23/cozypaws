@@ -3,6 +3,8 @@ import '../services/auth_service.dart';
 import 'signup_screen.dart';
 import 'home_screen.dart';
 import 'forgotpassword_screen.dart';
+import 'admin/admin_page.dart';
+import '../models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,21 +28,40 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = true);
 
       try {
-        final success = await _authService.login(
+        final User? user = await _authService.login(
           emailOrNameController.text.trim(),
           passwordController.text.trim(),
         );
 
-        if (success) {
-          if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                userNameOrEmail: emailOrNameController.text.trim(),
+        if (user != null && mounted) {
+          
+          // --- TAMBAHKAN PRINT DI SINI ---
+          print("Login Sukses. Data User Diterima:");
+          print(user.toJson()); // Tampilkan semua data user
+          // --------------------------------
+
+          String role = user.role;
+          String userName = user.name;
+
+          if (role == 'admin') {
+            print("Role terdeteksi sebagai 'admin', navigasi ke AdminPage."); // <-- TAMBAHKAN INI JUGA
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdminPage(),
               ),
-            ),
-          );
+            );
+          } else {
+            print("Role terdeteksi sebagai '$role', navigasi ke HomeScreen."); // <-- TAMBAHKAN INI JUGA
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  userNameOrEmail: userName,
+                ),
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -50,9 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.toString())));
+        }
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -61,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // (UI Kamu di sini tidak diubah sama sekali)
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -97,8 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin:
-                    const EdgeInsets.only(top: 180, left: 40, right: 40, bottom: 40),
+                margin: const EdgeInsets.only(
+                    top: 180, left: 40, right: 40, bottom: 40),
                 padding: const EdgeInsets.fromLTRB(20, 40, 20, 40),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -147,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             hintText: "Username atau Email",
                             hintStyle: const TextStyle(
-                              fontSize: 12, 
+                              fontSize: 12,
                               color: Colors.grey,
                             ),
                             border: OutlineInputBorder(
@@ -158,6 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (value == null || value.isEmpty) {
                               return "Wajib diisi";
                             }
+                            // Tambahkan validasi email jika perlu
                             return null;
                           },
                         ),
@@ -168,12 +193,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: passwordController,
                           obscureText: _obscurePassword,
                           style: const TextStyle(
-                            fontSize: 12, 
+                            fontSize: 12,
                           ),
                           decoration: InputDecoration(
                             hintText: "Password",
                             hintStyle: const TextStyle(
-                              fontSize: 12, 
+                              fontSize: 12,
                               color: Colors.grey,
                             ),
                             border: OutlineInputBorder(
@@ -260,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 BorderRadius.all(Radius.circular(30)),
                           ),
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _login,
+                            onPressed: _isLoading ? null : _login, // Panggil _login()
                             style: ElevatedButton.styleFrom(
                               elevation: 0,
                               backgroundColor: Colors.transparent,
@@ -332,7 +357,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-//  Clipper untuk header melengkung
+//  Clipper untuk header melengkung
 class HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -352,3 +377,4 @@ class HeaderClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; 
+// Import AuthService untuk panggil API
+import '../services/auth_service.dart'; 
+// Import model User untuk mendapatkan ID
+import '../models/user.dart'; 
 import '../utils/format_utils.dart';
+// Hapus import SharedPreferences dan dart:convert
 
 class OrderScreen extends StatefulWidget {
   final String packageName;
@@ -23,7 +26,115 @@ class _OrderScreenState extends State<OrderScreen> {
   final _catNameController = TextEditingController();
   final _phoneController = TextEditingController();
   DateTime? _selectedDate;
+  bool _isLoading = false; // Tambahkan state loading
 
+  // Buat instance AuthService
+  final AuthService _authService = AuthService();
+  User? _currentUser; // Untuk menyimpan data user yang sedang login
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser(); // Ambil data user saat halaman dibuka
+  }
+
+  // Fungsi untuk mengambil data user yang login (kita butuh ID-nya)
+  Future<void> _loadCurrentUser() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null) {
+      setState(() {
+        _currentUser = user;
+        // Isi otomatis nama pemilik
+        _ownerController.text = user.name; 
+        // TODO: Jika model User punya 'telepon', isi juga _phoneController
+        // if (user.telepon != null) {
+        //   _phoneController.text = user.telepon!;
+        // }
+      });
+    } else {
+      // Jika tidak ada user (seharusnya tidak mungkin jika sudah login)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: Tidak dapat menemukan data pengguna.'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  // --- FUNGSI INI DIGANTI TOTAL ---
+  // Fungsi untuk menyimpan pesanan ke MongoDB via API
+  Future<void> _saveOrderToMongo() async {
+    // Validasi tambahan sebelum kirim
+    if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Harap lengkapi semua data."),
+        ),
+      );
+      return;
+    }
+     if (_selectedDate == null) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Harap pilih tanggal booking."),
+        ),
+      );
+      return;
+    }
+    if (_currentUser == null || _currentUser!.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: User tidak terdeteksi. Silakan login ulang.'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true); // Mulai loading
+
+    // Buat data pesanan baru sesuai Model Order.js di backend
+    Map<String, dynamic> newOrderData = {
+      'userId': _currentUser!.id, // ID user yang sedang login
+      'packageName': widget.packageName,
+      'price': widget.price,
+      'ownerName': _ownerController.text,
+      'catName': _catNameController.text,
+      'bookingDate': _selectedDate!.toIso8601String(), // Kirim sebagai ISO String (standar)
+      'phone': _phoneController.text,
+      // 'status' akan otomatis 'Menunggu Konfirmasi' (default di backend)
+    };
+
+    try {
+      // Panggil API createOrder
+      await _authService.createOrder(newOrderData);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.purple,
+          content: Text(
+            "Pesanan ${widget.packageName} berhasil dibuat!",
+          ),
+        ),
+      );
+      Navigator.pop(context); // Kembali ke halaman detail
+
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Gagal membuat pesanan: $e"),
+        ),
+      );
+    } finally {
+       if (mounted) {
+         setState(() => _isLoading = false); // Hentikan loading
+       }
+    }
+  }
+  // --- BATAS PERUBAHAN ---
+
+
+  // Fungsi untuk dekorasi input (tidak berubah)
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -45,38 +156,13 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-    // Fungsi untuk menyimpan pesanan ke SharedPreferences
-  Future<void> _saveOrder() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Ambil daftar pesanan lama (kalau ada)
-    List<String> existingOrders = prefs.getStringList('orders') ?? [];
-
-    // Buat pesanan baru dalam bentuk map
-    Map<String, dynamic> newOrder = {
-      'packageName': widget.packageName,
-      'price': widget.price,
-      'owner': _ownerController.text,
-      'catName': _catNameController.text,
-      'date': _selectedDate != null
-          ? "${_selectedDate!.day}-${_selectedDate!.month}-${_selectedDate!.year}"
-          : "",
-      'phone': _phoneController.text,
-    };
-
-    // Tambahkan ke list lama
-    existingOrders.add(jsonEncode(newOrder));
-
-    // Simpan kembali ke SharedPreferences
-    await prefs.setStringList('orders', existingOrders);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8FC),
       appBar: AppBar(
-        title: const Text(
+        // ... (AppBar tidak berubah) ...
+         title: const Text(
           "Pesanan Anda",
           style: TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
@@ -103,6 +189,7 @@ class _OrderScreenState extends State<OrderScreen> {
               constraints: const BoxConstraints(maxWidth: 500),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
+                // ... (Dekorasi container tidak berubah) ...
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
@@ -117,6 +204,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 shrinkWrap: true,
                 padding: const EdgeInsets.only(bottom: 40),
                 children: [
+                  // ... (Bagian Judul Paket & Harga tidak berubah) ...
                   Center(
                     child: Column(
                       children: [
@@ -130,12 +218,12 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                        FormatUtils.rupiah(widget.price), 
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.green,
-                            fontWeight: FontWeight.w600),
-                      ),
+                          FormatUtils.rupiah(widget.price), 
+                          style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ],
                     ),
                   ),
@@ -161,12 +249,16 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                   const SizedBox(height: 14),
 
+                  // --- Logika Tanggal Booking Diperbaiki ---
                   InkWell(
                     onTap: () async {
+                      // Jangan biarkan pilih tanggal jika sedang loading
+                      if (_isLoading) return; 
+                      
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
+                        initialDate: DateTime.now().add(Duration(days: 1)), // Mulai besok
+                        firstDate: DateTime.now().add(Duration(days: 1)), // Tidak bisa hari ini
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {
@@ -197,14 +289,25 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                     ),
                   ),
-                  if (_selectedDate == null)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6, left: 6),
-                      child: Text(
-                        "Tanggal booking wajib diisi",
-                        style: TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
+                  // Validator manual untuk tanggal
+                  ValueListenableBuilder(
+                    valueListenable: ValueNotifier(_selectedDate), 
+                    builder: (context, value, child) {
+                      // Kita hanya tampilkan error jika user mencoba submit (dihandle di tombol)
+                      // Tapi kita bisa beri tanda visual jika belum diisi
+                      if (_selectedDate == null) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6, left: 12),
+                          child: Text(
+                            "Tanggal booking wajib diisi",
+                            // Style dibuat lebih halus agar tidak terlalu agresif
+                            style: TextStyle(color: Colors.grey[600], fontSize: 12), 
+                          ),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    }
+                  ),
                   const SizedBox(height: 14),
 
                   TextFormField(
@@ -243,30 +346,10 @@ class _OrderScreenState extends State<OrderScreen> {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate() &&
-                              _selectedDate != null) {
-                            await _saveOrder(); //simpan pesanan
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.purple,
-                                content: Text(
-                                  "Pesanan ${widget.packageName} berhasil disimpan!",
-                                ),
-                              ),
-                            );
-                            Navigator.pop(context); // kembali ke halaman sebelumnya
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                backgroundColor: Colors.purple,
-                                content: Text(
-                                  "Lengkapi semua data sebelum konfirmasi",
-                                ),
-                              ),
-                            );
-                          }
+                        // Nonaktifkan tombol saat loading
+                        onPressed: _isLoading ? null : () async {
+                          // Panggil fungsi baru
+                          await _saveOrderToMongo();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
@@ -275,15 +358,17 @@ class _OrderScreenState extends State<OrderScreen> {
                             borderRadius: BorderRadius.circular(50),
                           ),
                         ),
-                        child: const Text(
-                          "Konfirmasi Pesanan",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
+                        child: _isLoading 
+                          ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          : const Text(
+                              "Konfirmasi Pesanan",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
                       ),
                     ),
                   ),
