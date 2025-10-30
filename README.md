@@ -38,7 +38,7 @@ Database terdiri dari 7 koleksi utama:
 
 Dibuat oleh:
 
-1. muahmmad rifqi iqbal ghufron (24111814073)
+1. Muhhmmad Rifqi Iqbal Ghufron (24111814073)
 
 2. Febriana Nur Aini (24111814006)
 
@@ -46,7 +46,7 @@ Dibuat oleh:
 
 4. M.Amrullah Widyapratama (24111814136)
 
-5. Anggota
+5. Muhammad Dava Khoirur R. (24111814068)
 
 **Dosen Pengampu:** Bonda Sisephaputra, M.Kom  
 **Mata Kuliah:** Basis Data – Semester 3  
