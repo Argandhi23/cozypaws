@@ -46,7 +46,7 @@ Dibuat oleh:
 
 4. M.Amrullah Widyapratama (24111814136)
 
-5. Muhammad Dava Khoirur R. (24111814068)
+5. Muhammad Dava Khoirur Roziqy (24111814068)
 
 **Dosen Pengampu:** Bonda Sisephaputra, M.Kom  
 **Mata Kuliah:** Basis Data – Semester 3  
