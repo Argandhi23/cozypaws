@@ -42,7 +42,7 @@ Dibuat oleh:
 
 2. Febriana Nur Aini (24111814006)
 
-3. Anggota
+3. Faqih Rafasha Argandhi (24111814032)
 
 4. Anggota
 
