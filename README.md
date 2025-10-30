@@ -1,16 +1,53 @@
-# belajarflutter
+# 🐾 Cozypaws – Implementasi Sistem Database pada Aplikasi Petcare
 
-A new Flutter project.
+Aplikasi **Cozypaws** merupakan proyek akhir mata kuliah **Basis Data** yang dikembangkan oleh mahasiswa Program Studi **Informatika Universitas Negeri Surabaya (Kampus 5)**.  Proyek ini mengimplementasikan sistem basis data **MongoDB** untuk aplikasi **manajemen perawatan hewan peliharaan** berbasis **(Flutter)**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📚 Deskripsi Proyek
 
-A few resources to get you started if this is your first Flutter project:
+Cozypaws adalah aplikasi layanan yang membantu pemilik hewan peliharaan dalam:
+- Mengelola **profil pengguna dan staf layanan**.
+- Melakukan **pemesanan (appointment)** layanan perawatan hewan.
+- Menyediakan **produk dan pemesanan barang** untuk kebutuhan hewan.
+- Memberikan **ulasan (review)** terhadap layanan yang digunakan.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Aplikasi ini dirancang menggunakan **arsitektur client-server** dengan teknologi modern:
+- **Frontend:** Flutter  
+- **Backend:** Node.js  
+- **Database:** MongoDB  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🗃️ Struktur Database (MongoDB)
+
+Database terdiri dari 7 koleksi utama:
+
+| Collection | Deskripsi |
+|-------------|------------|
+| **users** | Menyimpan data pengguna aplikasi (pemilik hewan/pelanggan) termasuk profil, kontak, dan autentikasi. |
+| **staff** | Menyimpan data dokter hewan, groomer, atau staf penyedia layanan. |
+| **appointments** | Menyimpan data pemesanan layanan seperti konsultasi, vaksinasi, dan grooming. |
+| **products** | Menyimpan data produk yang dijual (makanan, perlengkapan, vitamin, dll). |
+| **orders** | Menyimpan data pesanan produk dari pengguna, terhubung ke `users` dan `products`. |
+| **payments** | Menyimpan data transaksi pembayaran untuk layanan maupun pesanan produk. |
+| **reviews** | Menyimpan ulasan dan rating pengguna terhadap layanan atau produk yang telah digunakan/dibeli. |
+
+
+## 👨‍💻 Tim Pengembang
+
+Dibuat oleh:
+
+1. Ketua
+
+2. Febriana Nur Aini (24111814006)
+
+3. Anggota
+
+4. Anggota
+
+5. Anggota
+
+**Dosen Pengampu:** Bonda Sisephaputra, M.Kom  
+**Mata Kuliah:** Basis Data – Semester 3  
+**Program Studi:** S1 Informatika – Universitas Negeri Surabaya (UNESA) Kampus 5
