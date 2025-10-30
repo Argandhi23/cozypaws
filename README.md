@@ -38,7 +38,7 @@ Database terdiri dari 7 koleksi utama:
 
 Dibuat oleh:
 
-1. Ketua
+1. muahmmad rifqi iqbal ghufron (24111814073)
 
 2. Febriana Nur Aini (24111814006)
 
