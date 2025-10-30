@@ -1,0 +1,65 @@
+[{
+  "_id": {
+    "$oid": "68e2920c366367c65d240748"
+  },
+  "nama": "Budi Wiyono",
+  "email": "budi.wiyono@petcare.com",
+  "telp": "081785459230",
+  "posisi": "Groomer Senior",
+  "keahlian": [
+    "Anjing Besar",
+    "Cukur Khusus"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68e2920c366367c65d240749"
+  },
+  "nama": "Citra Kirana",
+  "email": "citrakirana@petcare.com",
+  "telp": "087298365098",
+  "posisi": "Pet Sitter & Boarding Staff",
+  "keahlian": [
+    "Kucing",
+    "Anjing",
+    "Medikasi Oral"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68e2920c366367c65d24074a"
+  },
+  "nama": "Asep Jajang",
+  "email": "asepjajang@petcare.com",
+  "telp": "085000112233",
+  "posisi": "Groomer Junior",
+  "keahlian": [
+    "Kucing",
+    "Anjing Kecil"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68e2920c366367c65d24074b"
+  },
+  "nama": "Dr. Rina Wijaya",
+  "email": "rinawijaya@petcare.com",
+  "telp": "085083456873",
+  "posisi": "Dokter Hewan",
+  "keahlian": [
+    "Pemeriksaan Kesehatan Ringan",
+    "Vaksinasi"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68e29290366367c65d24074c"
+  },
+  "nama": "Dudung Putra",
+  "email": "dudungputra@petcare.com",
+  "telp": "085564786873",
+  "posisi": "Admin",
+  "keahlian": [
+    "Admin"
+  ]
+}]

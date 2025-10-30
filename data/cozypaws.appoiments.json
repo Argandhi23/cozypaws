@@ -1,0 +1,58 @@
+[{
+  "_id": {
+    "$oid": "68e29c36366367c65d240757"
+  },
+  "order_id": {
+    "$oid": "68e288e2366367c65d240744"
+  },
+  "user_id": {
+    "$oid": "65d2c000a7e88a0001f11111"
+  },
+  "staff_id": {
+    "$oid": "68e2920c366367c65d240748"
+  },
+  "product_id": {
+    "$oid": "68e27e23366367c65d240739"
+  },
+  "pet_id": {
+    "$oid": "68e296c5366367c65d24074f"
+  },
+  "tanggal_mulai": {
+    "$date": "2025-10-05T10:00:00.000Z"
+  },
+  "durasi_menit": 45,
+  "tanggal_selesai": {
+    "$date": "2025-01-02T10:45:00.000Z"
+  },
+  "status": "terjadwal",
+  "catatan_khusus": "Mohon perhatikan area telinga hewan, sensitif."
+},
+{
+  "_id": {
+    "$oid": "68e29d13366367c65d24075b"
+  },
+  "order_id": {
+    "$oid": "68e288e2366367c65d240745"
+  },
+  "user_id": {
+    "$oid": "65d2c000a7e88a0001f22222"
+  },
+  "staff_id": {
+    "$oid": "68e2920c366367c65d24074b"
+  },
+  "product_id": {
+    "$oid": "68e27e23366367c65d24073c"
+  },
+  "pet_id": {
+    "$oid": "68e2973a366367c65d240750"
+  },
+  "tanggal_mulai": {
+    "$date": "2025-10-05T10:00:00.000Z"
+  },
+  "durasi_menit": 45,
+  "tanggal_selesai": {
+    "$date": "2025-10-05T10:45:00.000Z"
+  },
+  "status": "terjadwal",
+  "catatan_khusus": "Hindari penggunaan parfum, ada riwayat alergi."
+}]

@@ -1,0 +1,28 @@
+[{
+  "_id": {
+    "$oid": "68e28db2366367c65d240746"
+  },
+  "order_id": {
+    "$oid": "68e288e2366367c65d240744"
+  },
+  "tanggal_bayar": {
+    "$date": "2025-10-05T15:24:34.638Z"
+  },
+  "jumlah_bayar": 340000,
+  "metode": "e-money",
+  "status_transaksi": "BERHASIL"
+},
+{
+  "_id": {
+    "$oid": "68e28dfe366367c65d240747"
+  },
+  "order_id": {
+    "$oid": "68e28a8d366367c65d240745"
+  },
+  "tanggal_bayar": {
+    "$date": "2025-10-05T15:25:50.724Z"
+  },
+  "jumlah_bayar": 170000,
+  "metode": "QRIS",
+  "status_transaksi": "GAGAL"
+}]

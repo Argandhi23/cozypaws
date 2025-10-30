@@ -1,0 +1,132 @@
+[{
+  "_id": {
+    "$oid": "652e01b1a7e88a0001f11111"
+  },
+  "nama": "Iqbal Gufron",
+  "email": "iqbalgufron@gmail.com",
+  "password": "000000",
+  "telepon": "081234567890",
+  "alamat": "Jl. Merdeka No. 1, Magetan",
+  "pets": [
+    {
+      "pet_id": {
+        "$oid": "68e296c5366367c65d24074e"
+      },
+      "nama": "Milo",
+      "jenis": "Kucing",
+      "ras": "Persia",
+      "umur": 3,
+      "gender": "jantan"
+    },
+    {
+      "pet_id": {
+        "$oid": "68e296c5366367c65d24074f"
+      },
+      "nama": "Rocky",
+      "jenis": "Anjing",
+      "ras": "Golden Retriever",
+      "umur": 5,
+      "gender": "jantan"
+    }
+  ],
+  "notifications": [
+    {
+      "pesan": "Pembayaran berhasil diproses",
+      "tanggal_kirim": {
+        "$date": "2025-10-05T08:00:00.000Z"
+      },
+      "status": "terkirim"
+    },
+    {
+      "pesan": "Janji temu Anda untuk pemeriksaan kesehatan Luna pada tanggal 10 Oktober telah dikonfir",
+      "tanggal_kirim": {
+        "$date": "2025-10-05T13:49:25.817Z"
+      },
+      "status": "terkirim"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "652e01b1a7e88a0001f22222"
+  },
+  "nama": "Dava Rizky",
+  "email": "davarizky@gmail.com",
+  "password": "222222",
+  "telepon": "082345678901",
+  "alamat": "Jl. Sudirman No. 2, Magetan",
+  "pets": [
+    {
+      "pet_id": {
+        "$oid": "68e2973a366367c65d240750"
+      },
+      "nama": "Luna",
+      "jenis": "kucing",
+      "ras": "Domestik",
+      "umur": 2,
+      "gender": "betina"
+    }
+  ],
+  "notifications": [],
+  "role": "admin"
+},
+{
+  "_id": {
+    "$oid": "652e01b1a7e88a0001f33333"
+  },
+  "nama": "Amrullah",
+  "email": "amrullah@gmail.com",
+  "password": "333333",
+  "telepon": "083456789012",
+  "alamat": "Jl. Diponegoro No. 3, Madiun",
+  "pets": [],
+  "notifications": [],
+  "role": "admin"
+},
+{
+  "_id": {
+    "$oid": "652e01b1a7e88a0001f44444"
+  },
+  "nama": "Faqih Argandhi",
+  "email": "argandhi@gmail.com",
+  "password": "444444",
+  "telepon": "083825789922",
+  "alamat": "Jl. Soetomo No. 15, Madiun",
+  "pets": [],
+  "notifications": [],
+  "role": "admin"
+},
+{
+  "_id": {
+    "$oid": "652e01b1a7e88a0001f55555"
+  },
+  "nama": "Febrina",
+  "email": "febriana@gmail.com",
+  "password": "555555",
+  "telepon": "085536870603",
+  "alamat": "Jl. Ahmad Yani No. 2, Ngawi",
+  "pets": [
+    {
+      "pet_id": {
+        "$oid": "68e297cb366367c65d240751"
+      },
+      "nama": "Michi",
+      "jenis": "kucing",
+      "ras": "Domestik",
+      "umur": 2,
+      "gender": "betina"
+    }
+  ],
+  "notifications": []
+},
+{
+  "_id": {
+    "$oid": "69017487aff58a7164e173d0"
+  },
+  "nama": "aaaa",
+  "email": "aaaa@gmail.com",
+  "password": "12345678",
+  "pets": [],
+  "notifications": [],
+  "__v": 0
+}]

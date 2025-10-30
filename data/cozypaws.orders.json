@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "6902de9b2b2e038718a1b1d2"
+  },
+  "userId": {
+    "$oid": "652e01b1a7e88a0001f11111"
+  },
+  "packageName": "Pawtection",
+  "price": 150000,
+  "ownerName": "Iqbal Gufron",
+  "catName": "kukukkk",
+  "bookingDate": {
+    "$date": "2025-10-30T17:00:00.000Z"
+  },
+  "phone": "7987987987",
+  "status": "Dikonfirmasi",
+  "createdAt": {
+    "$date": "2025-10-30T03:42:19.795Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-30T03:48:03.577Z"
+  },
+  "__v": 0
+}]

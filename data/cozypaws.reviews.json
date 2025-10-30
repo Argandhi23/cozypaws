@@ -1,0 +1,19 @@
+[{
+  "_id": {
+    "$oid": "68e29ea8366367c65d24075c"
+  },
+  "user_id": {
+    "$oid": "652e01b1a7e88a0001f11111"
+  },
+  "product_id": {
+    "$oid": "68e27e23366367c65d240739"
+  },
+  "staff_id": {
+    "$oid": "68e2920c366367c65d240748"
+  },
+  "rating": 5,
+  "komentar": "Groomingnya rapi dan bersih sekali. Rocky jadi wangi dan kuku rapi dipotong sempurna!",
+  "tanggal": {
+    "$date": "2025-10-05T15:00:00.000Z"
+  }
+}]

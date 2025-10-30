@@ -1,0 +1,280 @@
+[{
+  "_id": {
+    "$oid": "6901d53670367754d37b5a87"
+  },
+  "name": "Grooming",
+  "price": 45000,
+  "description": "Karena meow juga butuh me-time~ biar makin paw-lush dan wangi cuddly!",
+  "imageUrl": "assets/images/grooming.png",
+  "serviceType": "Grooming",
+  "breed": "Kusyink",
+  "duration": 30,
+  "packages": [
+    {
+      "name": "Meow Glow",
+      "price": 50000,
+      "facilities": [
+        "Sisir Bulu",
+        "Potong Kuku"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a88"
+      }
+    },
+    {
+      "name": "Kitty Fresh",
+      "price": 85000,
+      "facilities": [
+        "Sisir Bulu",
+        "Potong Kuku",
+        "Bath Fresh",
+        "Blow Dry"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a89"
+      }
+    },
+    {
+      "name": "Pawfect Care",
+      "price": 120000,
+      "facilities": [
+        "Sisir Bulu",
+        "Potong Kuku",
+        "Bubble Bath",
+        "Fur Drying",
+        "Pembersihan Telinga"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a8a"
+      }
+    },
+    {
+      "name": "Royal Treatmeow",
+      "price": 185000,
+      "facilities": [
+        "Sisir Bulu",
+        "Potong Kuku",
+        "Clean & Fresh Bath",
+        "Blow Pawfect",
+        "Pembersihan Telinga",
+        "Pawfum Spray"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a8b"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-10-29T08:49:58.336Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-29T10:48:23.716Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901d53670367754d37b5a8d"
+  },
+  "name": "Boarding",
+  "price": 70000,
+  "description": "Liburan, ada acara, atau lagi sibuk? Jangan khawatir, biar si meow staycation di sini.",
+  "imageUrl": "assets/images/boarding.png",
+  "serviceType": "Boarding",
+  "breed": "Persia",
+  "days": 1,
+  "includeFood": true,
+  "packages": [
+    {
+      "name": "Nap Pawlace",
+      "price": 70000,
+      "facilities": [
+        "Ruang Nyaman",
+        "Makanan 2x sehari",
+        "Air Minum"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a8e"
+      }
+    },
+    {
+      "name": "Meowtel",
+      "price": 120000,
+      "facilities": [
+        "Ruang Nyaman",
+        "Makanan 3x sehari",
+        "Air Minum",
+        "Paw Playtime"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a8f"
+      }
+    },
+    {
+      "name": "Pawcation",
+      "price": 180000,
+      "facilities": [
+        "Suite Premium",
+        "Makanan Premium 3x sehari",
+        "Air Minum",
+        "Paw Playtime",
+        "Growmeow Treats"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a90"
+      }
+    },
+    {
+      "name": "Royal SuiteMeow",
+      "price": 250000,
+      "facilities": [
+        "Suite VIP Ber-AC",
+        "Makanan Super Premium",
+        "Air Minum",
+        "Paw Playtime",
+        "Growmeow Treats",
+        "Foto Pawtrait"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a91"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-10-29T08:49:58.359Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-29T08:49:58.359Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901d53670367754d37b5a93"
+  },
+  "name": "Vaksinasi",
+  "price": 80000,
+  "description": "Meowtection time! Jaga kesehatan si meow dengan vaksin biar tetap aktif, sehat, dan bebas dari penyakit!.",
+  "imageUrl": "assets/images/vaksin.png",
+  "serviceType": "Vaksinasi",
+  "breed": "Domestic",
+  "vaccineType": "Rabies",
+  "packages": [
+    {
+      "name": "MeowShield",
+      "price": 80000,
+      "facilities": [
+        "Vaksin Dasar",
+        "Kartu Vaksin"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a94"
+      }
+    },
+    {
+      "name": "Pawtection",
+      "price": 150000,
+      "facilities": [
+        "Vaksin Dasar",
+        "Vaksin Lanjutan",
+        "Kartu Vaksin"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a95"
+      }
+    },
+    {
+      "name": "FurGuard",
+      "price": 220000,
+      "facilities": [
+        "Vaksin Dasar",
+        "Vaksin Lanjutan",
+        "Cek Kesehatan Ringan",
+        "Kartu Vaksin"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a96"
+      }
+    },
+    {
+      "name": "Royal Puurtection",
+      "price": 300000,
+      "facilities": [
+        "Vaksin Dasar",
+        "Vaksin Lanjutan",
+        "Vaksin Lengkap",
+        "Cek Kesehatan Lengkap",
+        "Kartu Vaksin Eksklusif",
+        "Foto Pawtrait"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a97"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-10-29T08:49:58.373Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-29T08:49:58.373Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6901d53670367754d37b5a99"
+  },
+  "name": "Pick-up & Drop of",
+  "price": 30000,
+  "description": "Jemput dan antar paw kesayanganmu sampai Cozy Paws",
+  "imageUrl": "assets/images/antarjemput.png",
+  "serviceType": "AntarJemput",
+  "area": "Dalam Kota",
+  "distance": 10,
+  "packages": [
+    {
+      "name": "Dalam Kota",
+      "price": 30000,
+      "facilities": [
+        "Jemput dari rumah",
+        "Antar kembali",
+        "Maks 10 km"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a9a"
+      }
+    },
+    {
+      "name": "Luar Kota",
+      "price": 60000,
+      "facilities": [
+        "Jemput dari rumah",
+        "Antar kembali",
+        "Maks 25 km"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a9b"
+      }
+    },
+    {
+      "name": "VIP Ride",
+      "price": 100000,
+      "facilities": [
+        "Mobil khusus AC",
+        "CozyNest",
+        "Snack meow gratis",
+        "Maks 30 km"
+      ],
+      "_id": {
+        "$oid": "6901d53670367754d37b5a9c"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-10-29T08:49:58.387Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-29T08:49:58.387Z"
+  },
+  "__v": 0
+}]
