@@ -44,7 +44,7 @@ Dibuat oleh:
 
 3. Faqih Rafasha Argandhi (24111814032)
 
-4. Anggota
+4. M.Amrullah Widyapratama (24111814136)
 
 5. Anggota
 
