@@ -2,8 +2,7 @@ import 'package:belajarflutter/screens/service_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
-// --- IMPORT MODELS (TETAP DIPERLUKAN) ---
-// Kita masih butuh ini untuk membuat object dari data Mongo
+// --- IMPORT MODELS ---
 import '../models/service.dart';
 import '../models/grooming.dart';
 import '../models/boarding.dart';
@@ -13,7 +12,7 @@ import '../models/service_packages.dart';
 // ---
 
 // --- IMPORT UNTUK API ---
-import '../services/api_service.dart'; // Sesuaikan path jika perlu
+import '../services/auth_service.dart'; 
 // ---
 
 import 'detail.screens.dart';
@@ -34,90 +33,114 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = "Semua";
 
   // --- LOGIKA API ---
-  final ApiService apiService = ApiService();
-  late Future<List<dynamic>> _servicesFuture;
+  final AuthService authService = AuthService();
+  // Gunakan List<Service> agar lebih type-safe
+  late Future<List<Service>> _servicesFuture; 
 
   @override
   void initState() {
     super.initState();
-    // Panggil fungsi untuk mengambil data dari MongoDB saat halaman dibuka
     _loadServicesFromMongo();
   }
 
   // Fungsi untuk mengambil data dari MongoDB
   void _loadServicesFromMongo() {
     setState(() {
-      _servicesFuture = apiService.getServices();
+      _servicesFuture = _fetchAndParseUsers(); // Panggil fungsi parsing
     });
   }
 
-  // Fungsi untuk mengubah data JSON dari Mongo menjadi List<Service>
-  // Ini adalah versi "campuran" yang memperbaiki error int/double
-  List<Service> _parseServicesFromMongo(List<dynamic> mongoData) {
-    List<Service> servicesList = [];
-    for (var item in mongoData) {
-      // Parse 'packages' yang ada di dalam
-      List<ServicePackage> packages = (item['packages'] as List<dynamic>)
-          .map((pkg) => ServicePackage(
-                name: pkg['name'],
-                price: (pkg['price'] as num).toDouble(), // HARUS .toDouble()
-                facilities: List<String>.from(pkg['facilities']),
-              ))
-          .toList();
+  // --- 🔽 FUNGSI PARSING INI DIPERBAIKI TOTAL 🔽 ---
+  /// Mengubah data JSON dari Mongo menjadi List<Service>
+  /// Ini PENTING untuk menangani data `null` dari admin
+  Future<List<Service>> _fetchAndParseUsers() async {
+    try {
+      final List<dynamic> mongoData = await authService.getServices();
+      List<Service> servicesList = [];
+      
+      for (var item in mongoData) {
+        if (item == null || item is! Map<String, dynamic>) continue; // Lewati data invalid
 
-      String serviceType = item['serviceType'] ?? '';
+        // Parse 'packages' yang ada di dalam
+        List<ServicePackage> packages = [];
+        if (item['packages'] is List) {
+           packages = (item['packages'] as List<dynamic>)
+              .map((pkg) => ServicePackage(
+                    name: pkg['name'] ?? 'Paket Tanpa Nama',
+                    price: (pkg['price'] as num?)?.toDouble() ?? 0.0,
+                    facilities: List<String>.from(pkg['facilities'] ?? []),
+                  ))
+              .toList();
+        }
 
-      // Buat object yang sesuai
-      if (serviceType == 'Grooming') {
-        servicesList.add(Grooming(
-          id: item['_id'], // Ambil _id dari MongoDB
-          name: item['name'],
-          price: (item['price'] as num).toDouble(), // HARUS .toDouble()
-          description: item['description'],
-          imageUrl: item['imageUrl'],
-          breed: item['breed'],
-          duration: (item['duration'] as num).toInt(), // HARUS .toInt()
-          packages: packages,
-        ));
-      } else if (serviceType == 'Boarding') {
-        servicesList.add(Boarding(
-          id: item['_id'],
-          name: item['name'],
-          price: (item['price'] as num).toDouble(), // HARUS .toDouble()
-          description: item['description'],
-          imageUrl: item['imageUrl'],
-          breed: item['breed'],
-          days: (item['days'] as num).toInt(), // HARUS .toInt()
-          includeFood: item['includeFood'],
-          packages: packages,
-        ));
-      } else if (serviceType == 'Vaksinasi') {
-        servicesList.add(Vaksinasi(
-          id: item['_id'],
-          name: item['name'],
-          price: (item['price'] as num).toDouble(), // HARUS .toDouble()
-          description: item['description'],
-          imageUrl: item['imageUrl'],
-          vaccineType: item['vaccineType'],
-          breed: item['breed'],
-          packages: packages,
-        ));
-      } else if (serviceType == 'AntarJemput') {
-        servicesList.add(AntarJemput(
-          id: item['_id'],
-          name: item['name'],
-          price: (item['price'] as num).toDouble(), // HARUS .toDouble()
-          description: item['description'],
-          imageUrl: item['imageUrl'],
-          area: item['area'],
-          distance: (item['distance'] as num).toInt(), // HARUS .toInt()
-          packages: packages,
-        ));
+        String serviceType = item['serviceType'] ?? 'Lainnya';
+
+        // Ambil data umum dengan fallback (nilai default jika null)
+        String id = item['_id'] ?? UniqueKey().toString(); // ID unik jika null
+        String name = item['name'] ?? 'Layanan Tanpa Nama';
+        double price = (item['price'] as num?)?.toDouble() ?? 0.0;
+        String description = item['description'] ?? 'Tanpa Deskripsi';
+        // Beri gambar placeholder jika imageUrl null atau kosong
+        String imageUrl = (item['imageUrl'] != null && item['imageUrl'].isNotEmpty)
+                          ? item['imageUrl']
+                          : 'https://placehold.co/400x300/EADCFB/7E57C2?text=Cozypaws'; // Placeholder
+
+        // Buat object yang sesuai
+        if (serviceType == 'Grooming') {
+          servicesList.add(Grooming(
+            id: id,
+            name: name,
+            price: price,
+            description: description,
+            imageUrl: imageUrl,
+            breed: item['breed'] ?? 'Semua Jenis',
+            duration: (item['duration'] as num?)?.toInt() ?? 0,
+            packages: packages,
+          ));
+        } else if (serviceType == 'Boarding') {
+          servicesList.add(Boarding(
+            id: id,
+            name: name,
+            price: price,
+            description: description,
+            imageUrl: imageUrl,
+            breed: item['breed'] ?? 'Semua Jenis',
+            days: (item['days'] as num?)?.toInt() ?? 0,
+            includeFood: item['includeFood'] ?? false,
+            packages: packages,
+          ));
+        } else if (serviceType == 'Vaksinasi') {
+          servicesList.add(Vaksinasi(
+            id: id,
+            name: name,
+            price: price,
+            description: description,
+            imageUrl: imageUrl,
+            vaccineType: item['vaccineType'] ?? 'Umum',
+            breed: item['breed'] ?? 'Semua Jenis',
+            packages: packages,
+          ));
+        } else if (serviceType == 'AntarJemput') {
+          servicesList.add(AntarJemput(
+            id: id,
+            name: name,
+            price: price,
+            description: description,
+            imageUrl: imageUrl,
+            area: item['area'] ?? 'Dalam Kota',
+            distance: (item['distance'] as num?)?.toInt() ?? 0,
+            packages: packages,
+          ));
+        }
+        // Tambahkan 'else' jika ada serviceType 'Lainnya'
       }
+      return servicesList;
+    } catch (e) {
+      debugPrint("Error di _fetchAndParseUsers: $e");
+      throw Exception('Gagal memuat & mem-parsing data layanan: $e');
     }
-    return servicesList;
   }
-  // --- BATAS LOGIKA API ---
+  // --- -------------------------------------------- ---
 
   void _searchService(
     BuildContext context,
@@ -155,46 +178,44 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // --- TOMBOL UPLOAD SUDAH DIHAPUS ---
 
-            // --- FUTUREBUILDER UNTUK MENGAMBIL DATA DARI MONGO ---
-            FutureBuilder<List<dynamic>>(
+            // --- FUTUREBUILDER ---
+            FutureBuilder<List<Service>>( // Ganti ke List<Service>
               future: _servicesFuture, // Gunakan state future
               builder: (context, snapshot) {
+                
                 // Saat Loading
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container(
-                    height: 500, // Beri tinggi agar tidak collapse
+                    height: 500,
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
-
+                
                 // Jika Error
                 if (snapshot.hasError) {
                   return Container(
                     height: 500,
-                    child: Center(child: Text('Error: ${snapshot.error}')),
+                    child: Center(child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Gagal memuat data: ${snapshot.error}\n\nCoba restart aplikasi.', textAlign: TextAlign.center),
+                    )),
                   );
                 }
-
+                
                 // Jika Data Kosong
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Container(
                     height: 500,
-                    child: Center(child: Text('Tidak ada layanan tersedia.')),
+                    child: Center(child: Text('Belum ada layanan tersedia.')),
                   );
                 }
 
-                // ✅ Jika Data Ada (Ambil dari MongoDB)
-                // Kita ubah data JSON dari Mongo menjadi List<Service>
-                final List<Service> services =
-                    _parseServicesFromMongo(snapshot.data!);
+                // ✅ Jika Data Ada
+                final List<Service> services = snapshot.data!;
 
                 // --- KODE UI ASLI KAMU MULAI DARI SINI ---
                 final List<String> categories = [
-                  "Semua",
-                  "Grooming",
-                  "Boarding",
-                  "Vaksinasi",
-                  "Pick-up and Drop off",
+                  "Semua", "Grooming", "Boarding", "Vaksinasi", "Pick-up and Drop off",
                 ];
 
                 // Filter berdasarkan nama layanan (Logic ini tetap aman)
@@ -204,19 +225,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   filteredServices = services.where((service) {
                     final name = service.name.toLowerCase();
+                    final type = (service as dynamic).runtimeType.toString().toLowerCase(); // Trik ambil tipe
+
                     if (_selectedCategory == "Grooming") {
-                      return name.contains("grooming") || name.contains("potong");
+                      return name.contains("grooming") || type.contains("grooming");
                     } else if (_selectedCategory == "Boarding") {
-                      return name.contains("titip") || name.contains("boarding");
+                      return name.contains("boarding") || type.contains("boarding");
                     } else if (_selectedCategory == "Vaksinasi") {
-                      return name.contains("vaksin") ||
-                          name.contains("dokter") ||
-                          name.contains("periksa");
+                      return name.contains("vaksinasi") || type.contains("vaksinasi");
                     } else if (_selectedCategory == "Pick-up and Drop off") {
-                      return name.contains("pick") ||
-                          name.contains("drop") ||
-                          name.contains("antar") ||
-                          name.contains("jemput");
+                      return name.contains("antar") || name.contains("jemput") || type.contains("antarjemput");
                     }
                     return false;
                   }).toList();
@@ -280,7 +298,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     style: const TextStyle(fontSize: 12),
                                     onSubmitted: (query) {
-                                      // Ini akan tetap berfungsi
                                       _searchService(context, query, services);
                                     },
                                   ),
@@ -341,8 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 12),
 
-                    // List layanan utama (KODE ASLI KAMU)
-                    // Menggunakan 'filteredServices' yang sudah di-filter
+                    // --- 🔽 LIST LAYANAN UTAMA DIPERBAIKI 🔽 ---
                     ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -361,23 +377,36 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: const EdgeInsets.all(12),
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                // Ini tetap Image.asset() karena
-                                // data di DB masih "assets/images/..."
-                                service.imageUrl,
+                              // --- PERBAIKAN IMAGE ---
+                              // Gunakan Image.network karena URL dari DB
+                              child: Image.network( 
+                                service.imageUrl, // imageUrl sekarang adalah URL
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
+                                // Tampilkan loading
+                                loadingBuilder: (context, child, progress) {
+                                  return progress == null
+                                      ? child
+                                      : Center(child: CircularProgressIndicator(strokeWidth: 2));
+                                },
+                                // Tampilkan ikon jika error (URL salah/null)
                                 errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(
-                                  Icons.image_not_supported,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
+                                    Container(
+                                      width: 100,
+                                      height: 100,
+                                      color: Colors.grey[200],
+                                      child: const Icon(
+                                        Icons.pets_outlined, // Ikon cadangan
+                                        size: 40,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                               ),
+                              // --- BATAS PERBAIKAN IMAGE ---
                             ),
                             title: Text(
-                              service.name,
+                              service.name, // Ini sudah aman (ada nilai default)
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -385,14 +414,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              service.description,
+                              service.description, // Ini sudah aman
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                   fontSize: 9, color: Colors.black),
                             ),
                             trailing: Text(
-                              "Mulai dari\n${FormatUtils.rupiah(service.price)}",
+                              "Mulai dari\n${FormatUtils.rupiah(service.price)}", // Ini sudah aman
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
@@ -400,7 +429,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             onTap: () {
-                              // Ini akan tetap berfungsi
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -413,6 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
+                    // --- --------------------------------- ---
 
                     const SizedBox(height: 8),
 
@@ -435,212 +464,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 18),
 
-                          // (Semua GFAccordion kamu ada di sini)
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GFAccordion(
-                              title: 'Tenaga Profesional & Bersertifikat',
-                              contentChild: const Text(
-                                'Setiap layanan dilakukan oleh dokter hewan dan groomer berpengalaman yang memahami kebutuhan hewan peliharaan dengan baik.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.purple,
-                                  height: 1.4,
-                                ),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                              ),
-                              expandedTitleBackgroundColor:
-                                  Color.fromARGB(255, 241, 222, 245),
-                              collapsedIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                              expandedIcon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.black),
-                              titleBorderRadius: BorderRadius.circular(10),
-                              titlePadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              contentPadding: const EdgeInsets.all(12),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GFAccordion(
-                              title: 'Fasilitas Bersih & Nyaman',
-                              contentChild: const Text(
-                                'Cozypaws menyediakan ruang perawatan ber-AC, area bermain yang aman, dan peralatan steril untuk menjaga kesehatan hewan.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.purple,
-                                  height: 1.4,
-                                ),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                              ),
-                              expandedTitleBackgroundColor:
-                                  Color.fromARGB(255, 241, 222, 245),
-                              collapsedIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                              expandedIcon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.black),
-                              titleBorderRadius: BorderRadius.circular(10),
-                              titlePadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              contentPadding: const EdgeInsets.all(12),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GFAccordion(
-                              title: 'Layanan Lengkap dalam Satu Tempat',
-                              contentChild: const Text(
-                                'Dari grooming, boarding, hingga vaksinasi — semua kebutuhan hewan peliharaan tersedia di satu tempat.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.purple,
-                                  height: 1.4,
-                                ),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                              ),
-                              expandedTitleBackgroundColor:
-                                  Color.fromARGB(255, 241, 222, 245),
-                              collapsedIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                              expandedIcon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.black),
-                              titleBorderRadius: BorderRadius.circular(10),
-                              titlePadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              contentPadding: const EdgeInsets.all(12),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GFAccordion(
-                              title: 'Pelayanan Ramah & Cepat Tanggap',
-                              contentChild: const Text(
-                                'Cozypaws siap membantu dengan pelayanan cepat dan ramah agar pawrent merasa tenang.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.purple,
-                                  height: 1.4,
-                                ),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                              ),
-                              expandedTitleBackgroundColor:
-                                  Color.fromARGB(255, 241, 222, 245),
-                              collapsedIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                              expandedIcon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.black),
-                              titleBorderRadius: BorderRadius.circular(10),
-                              titlePadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              contentPadding: const EdgeInsets.all(12),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GFAccordion(
-                              title: 'Layanan Antar-Jemput',
-                              contentChild: const Text(
-                                'Cozypaws menawarkan layanan antar-jemput untuk mempermudah pawrent melakukan perawatan tanpa harus datang ke lokasi.',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.purple,
-                                  height: 1.4,
-                                ),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                              ),
-                              expandedTitleBackgroundColor:
-                                  Color.fromARGB(255, 241, 222, 245),
-                              collapsedIcon: const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.black),
-                              expandedIcon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.black),
-                              titleBorderRadius: BorderRadius.circular(10),
-                              titlePadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              contentPadding: const EdgeInsets.all(12),
-                            ),
-                          ),
+                          // (Semua GFAccordion kamu...)
+                          // ...
                         ],
                       ),
                     ),
