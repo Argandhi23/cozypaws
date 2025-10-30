@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // --- 🔽 FUNGSI PARSING INI DIPERBAIKI TOTAL 🔽 ---
   /// Mengubah data JSON dari Mongo menjadi List<Service>
-  /// Ini PENTING untuk menangani data `null` dari admin
+  /// PENTING untuk menangani data `null` dari admin
   Future<List<Service>> _fetchAndParseUsers() async {
     try {
       final List<dynamic> mongoData = await authService.getServices();
@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String query,
     List<Service> services,
   ) {
-    // Fungsi search ini TIDAK PERLU DIUBAH
+    // Fungsi search
     final results = services
         .where(
           (service) =>
@@ -176,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- TOMBOL UPLOAD SUDAH DIHAPUS ---
 
             // --- FUTUREBUILDER ---
             FutureBuilder<List<Service>>( // Ganti ke List<Service>
@@ -213,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ✅ Jika Data Ada
                 final List<Service> services = snapshot.data!;
 
-                // --- KODE UI ASLI KAMU MULAI DARI SINI ---
+                // --- KODE UI MULAI DARI SINI ---
                 final List<String> categories = [
                   "Semua", "Grooming", "Boarding", "Vaksinasi", "Pick-up and Drop off",
                 ];
@@ -244,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Gradient (KODE ASLI KAMU)
+                    // Header Gradient 
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(16, 30, 16, 30),
@@ -277,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 TextStyle(fontSize: 14, color: Colors.white70),
                           ),
                           const SizedBox(height: 20),
-                          // Search bar (KODE ASLI KAMU)
+                          // Search bar 
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
@@ -311,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Filter kategori (KODE ASLI KAMU)
+                    // Filter kategori
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: SingleChildScrollView(
@@ -358,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 12),
 
-                    // --- 🔽 LIST LAYANAN UTAMA DIPERBAIKI 🔽 ---
+                    // --- 🔽 LIST LAYANAN UTAMA 🔽 ---
                     ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -406,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               // --- BATAS PERBAIKAN IMAGE ---
                             ),
                             title: Text(
-                              service.name, // Ini sudah aman (ada nilai default)
+                              service.name, 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -414,14 +413,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              service.description, // Ini sudah aman
+                              service.description, 
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                   fontSize: 9, color: Colors.black),
                             ),
                             trailing: Text(
-                              "Mulai dari\n${FormatUtils.rupiah(service.price)}", // Ini sudah aman
+                              "Mulai dari\n${FormatUtils.rupiah(service.price)}", 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
@@ -445,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 8),
 
-                    // "Mengapa Memilih Kami" (KODE ASLI KAMU)
+                    // "Mengapa Memilih Kami"
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 8),
@@ -477,15 +476,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } else if (index == 1) {
-      return const ServiceScreen(); // Halaman Service (Tidak berubah)
+      return const ServiceScreen(); // Halaman Service 
     } else {
-      return const ProfileScreen(); // Halaman Profile (Tidak berubah)
+      return const ProfileScreen(); // Halaman Profile 
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fungsi build() utama ini TIDAK BERUBAH
+    // Fungsi build() utama 
     return Scaffold(
       body: _buildPage(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(

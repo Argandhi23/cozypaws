@@ -102,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: const Text(
-                  "by : B_006_FEBRIANA N.A",
+                  "by : KELOMPOK 6 2024B",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10,
