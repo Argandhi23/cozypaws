@@ -408,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               service.name, 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 11,
+                                fontSize: 12,
                                 color: Colors.purple,
                               ),
                             ),
@@ -417,14 +417,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                  fontSize: 9, color: Colors.black),
+                                  fontSize: 10, color: Colors.black),
                             ),
                             trailing: Text(
                               "Mulai dari\n${FormatUtils.rupiah(service.price)}", 
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
-                                fontSize: 8,
+                                fontSize: 10,
                               ),
                             ),
                             onTap: () {
@@ -483,13 +483,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentChild: const Text(
                         'Setiap layanan dilakukan oleh dokter hewan dan groomer berpengalaman yang memahami kebutuhan hewan peliharaan dengan baik.',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.purple,
                           height: 1.4,
                         ),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: Colors.black,
                       ),
                       expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
@@ -521,13 +521,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentChild: const Text(
                         'Cozypaws menyediakan ruang perawatan ber-AC, area bermain yang aman, dan peralatan steril untuk menjaga kesehatan hewan.',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.purple,
                           height: 1.4,
                         ),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: Colors.black,
                       ),
                       expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
@@ -559,13 +559,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentChild: const Text(
                         'Dari grooming, boarding, hingga vaksinasi — semua kebutuhan hewan peliharaan tersedia di satu tempat.',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.purple,
                           height: 1.4,
                         ),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: Colors.black,
                       ),
                       expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
@@ -597,13 +597,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentChild: const Text(
                         'Cozypaws siap membantu dengan pelayanan cepat dan ramah agar pawrent merasa tenang.',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.purple,
                           height: 1.4,
                         ),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: Colors.black,
                       ),
                       expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
@@ -635,13 +635,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentChild: const Text(
                         'Cozypaws menawarkan layanan antar-jemput untuk mempermudah pawrent melakukan perawatan tanpa harus datang ke lokasi.',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           color: Colors.purple,
                           height: 1.4,
                         ),
                       ),
                       textStyle: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         color: Colors.black,
                       ),
                       expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
