@@ -235,10 +235,28 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Manajemen Layanan'),
-        backgroundColor: Colors.deepPurple,
-        // Tombol Refresh dipindah ke RefreshIndicator
+      elevation: 0,
+      foregroundColor: Colors.white,
+      title: Text(
+        'Manajemen Layanan',
+        style: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 20,
+        ),
       ),
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFF48FB1),
+              Color(0xFF7E57C2),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+    ),
       // Gunakan RefreshIndicator
       body: RefreshIndicator(
         onRefresh: _muatLayanan, // Panggil fungsi muat ulang saat ditarik

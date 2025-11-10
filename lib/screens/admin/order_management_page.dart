@@ -124,10 +124,27 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Manajemen Pesanan'),
-        backgroundColor: Colors.deepPurple,
-        // Tombol Refresh dipindah ke RefreshIndicator
+      elevation: 0,
+      foregroundColor: Colors.white,
+      title: Text(
+        'Manajemen Pesanan',
+        style: TextStyle(
+          fontFamily: 'Poppins', fontSize: 20,
+        ),
       ),
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFF48FB1),
+              Color(0xFF7E57C2),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+    ),
       // Gunakan RefreshIndicator
       body: RefreshIndicator(
         onRefresh: _muatPesanan, // Panggil fungsi muat ulang saat ditarik
