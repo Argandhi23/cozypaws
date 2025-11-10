@@ -463,8 +463,195 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 18),
 
-                          // (Semua GFAccordion kamu...)
-                          // ...
+                          // Accordion 1
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GFAccordion(
+                      title: 'Tenaga Profesional & Bersertifikat',
+                      contentChild: const Text(
+                        'Setiap layanan dilakukan oleh dokter hewan dan groomer berpengalaman yang memahami kebutuhan hewan peliharaan dengan baik.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.purple,
+                          height: 1.4,
+                        ),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                      ),
+                      expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
+                      collapsedIcon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      expandedIcon: const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+                      titleBorderRadius: BorderRadius.circular(10),
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  // Accordion 2
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GFAccordion(
+                      title: 'Fasilitas Bersih & Nyaman',
+                      contentChild: const Text(
+                        'Cozypaws menyediakan ruang perawatan ber-AC, area bermain yang aman, dan peralatan steril untuk menjaga kesehatan hewan.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.purple,
+                          height: 1.4,
+                        ),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                      ),
+                      expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
+                      collapsedIcon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      expandedIcon: const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+                      titleBorderRadius: BorderRadius.circular(10),
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  // Accordion 3
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GFAccordion(
+                      title: 'Layanan Lengkap dalam Satu Tempat',
+                      contentChild: const Text(
+                        'Dari grooming, boarding, hingga vaksinasi — semua kebutuhan hewan peliharaan tersedia di satu tempat.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.purple,
+                          height: 1.4,
+                        ),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                      ),
+                      expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
+                      collapsedIcon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      expandedIcon: const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+                      titleBorderRadius: BorderRadius.circular(10),
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  // Accordion 4
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GFAccordion(
+                      title: 'Pelayanan Ramah & Cepat Tanggap',
+                      contentChild: const Text(
+                        'Cozypaws siap membantu dengan pelayanan cepat dan ramah agar pawrent merasa tenang.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.purple,
+                          height: 1.4,
+                        ),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                      ),
+                      expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
+                      collapsedIcon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      expandedIcon: const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+                      titleBorderRadius: BorderRadius.circular(10),
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  // Accordion 5
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GFAccordion(
+                      title: 'Layanan Antar-Jemput',
+                      contentChild: const Text(
+                        'Cozypaws menawarkan layanan antar-jemput untuk mempermudah pawrent melakukan perawatan tanpa harus datang ke lokasi.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.purple,
+                          height: 1.4,
+                        ),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black,
+                      ),
+                      expandedTitleBackgroundColor: Color.fromARGB(255, 241, 222, 245),
+                      collapsedIcon: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                      expandedIcon: const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+                      titleBorderRadius: BorderRadius.circular(10),
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.all(12),
+                          ),
+                         ),
                         ],
                       ),
                     ),

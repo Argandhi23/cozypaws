@@ -194,67 +194,98 @@ class _OrderManagementPageState extends State<OrderManagementPage> {
                 // Format harga dengan FormatUtils
                 String formattedPrice = FormatUtils.rupiah(order['price']?.toDouble() ?? 0.0);
 
-                return ListTile(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10), // Atur padding
-                  // Ikon berdasarkan status? Atau biarkan simpel
-                  // leading: Icon(Icons.receipt_outlined), 
+                return Card(
+                color: Colors.white,
+                elevation: 6,
+                shadowColor: Colors.black26,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+
                   title: Text(
-                    order['packageName'] ?? 'Tanpa Nama Paket', 
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
+                    order['packageName'] ?? 'Tanpa Nama Paket',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
-                  subtitle: Padding( // Beri padding di bawah title
+
+                  subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Gunakan RichText untuk label tebal
-                        RichText(text: TextSpan(style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13), children: [
-                          TextSpan(text: 'Pemesan: ', style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: "${order['ownerName'] ?? 'N/A'} ($userName)"),
-                        ])),
-                        RichText(text: TextSpan(style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13), children: [
-                          TextSpan(text: 'Kucing: ', style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: "${order['catName'] ?? 'N/A'}"),
-                        ])),
-                         RichText(text: TextSpan(style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13), children: [
-                          TextSpan(text: 'Tanggal: ', style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: formattedDate),
-                        ])),
-                         RichText(text: TextSpan(style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13), children: [
-                          TextSpan(text: 'Kontak: ', style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: "${order['phone'] ?? 'N/A'}"),
-                        ])),
-                        SizedBox(height: 6),
-                        Row( // Letakkan harga dan status sejajar
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text(
-                               formattedPrice,
-                               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green[700], fontSize: 13),
-                             ),
-                             Chip(
-                                label: Text(order['status'] ?? 'N/A'),
-                                backgroundColor: _getStatusColor(order['status']),
-                                labelStyle: TextStyle(
-                                  fontSize: 10,
+                        RichText(text: TextSpan(
+                          style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13),
+                          children: [
+                            TextSpan(text: 'Pemesan: ', style: TextStyle(fontWeight: FontWeight.w600)),
+                            TextSpan(text: "${order['ownerName'] ?? 'N/A'} ($userName)"),
+                          ],
+                        )),
+
+                        RichText(text: TextSpan(
+                          style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13),
+                          children: [
+                            TextSpan(text: 'Kucing: ', style: TextStyle(fontWeight: FontWeight.w600)),
+                            TextSpan(text: "${order['catName'] ?? 'N/A'}"),
+                          ],
+                        )),
+
+                        RichText(text: TextSpan(
+                          style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13),
+                          children: [
+                            TextSpan(text: 'Tanggal: ', style: TextStyle(fontWeight: FontWeight.w600)),
+                            TextSpan(text: formattedDate),
+                          ],
+                        )),
+
+                        RichText(text: TextSpan(
+                          style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13),
+                          children: [
+                            TextSpan(text: 'Kontak: ', style: TextStyle(fontWeight: FontWeight.w600)),
+                            TextSpan(text: "${order['phone'] ?? 'N/A'}"),
+                          ],
+                        )),
+
+                        SizedBox(height: 8),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              formattedPrice,
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: _getStatusTextColor(order['status'])
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                visualDensity: VisualDensity.compact, // Perkecil chip
+                                  color: Colors.green[700],
+                                  fontSize: 13),
+                            ),
+
+                            Chip(
+                              label: Text(order['status'] ?? 'N/A'),
+                              backgroundColor: _getStatusColor(order['status']),
+                              labelStyle: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: _getStatusTextColor(order['status']),
                               ),
-                           ],
-                         ),
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                  trailing: IconButton( // Tombol edit status
+
+                  trailing: IconButton(
                     icon: Icon(Icons.edit_note, color: Colors.blueAccent),
                     tooltip: 'Ubah Status Pesanan',
                     onPressed: () => _tampilkanDialogUpdateStatus(order),
-                     visualDensity: VisualDensity.compact, // Perkecil tombol ikon
+                    visualDensity: VisualDensity.compact,
                   ),
-                );
+                ),
+              );
               },
             );
           },
