@@ -12,7 +12,7 @@ import '../models/service_packages.dart';
 // ---
 
 // --- IMPORT UNTUK API ---
-import '../services/auth_service.dart'; 
+import '../services/auth_service.dart';
 // ---
 
 import 'detail.screens.dart';
@@ -34,8 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // --- LOGIKA API ---
   final AuthService authService = AuthService();
-  // Gunakan List<Service> agar lebih type-safe
-  late Future<List<Service>> _servicesFuture; 
+  late Future<List<Service>> _servicesFuture;
 
   @override
   void initState() {
@@ -43,28 +42,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadServicesFromMongo();
   }
 
-  // Fungsi untuk mengambil data dari MongoDB
   void _loadServicesFromMongo() {
     setState(() {
-      _servicesFuture = _fetchAndParseUsers(); // Panggil fungsi parsing
+      _servicesFuture = _fetchAndParseUsers();
     });
   }
 
-  // --- 🔽 FUNGSI PARSING INI DIPERBAIKI TOTAL 🔽 ---
-  /// Mengubah data JSON dari Mongo menjadi List<Service>
-  /// PENTING untuk menangani data `null` dari admin
   Future<List<Service>> _fetchAndParseUsers() async {
     try {
       final List<dynamic> mongoData = await authService.getServices();
       List<Service> servicesList = [];
-      
-      for (var item in mongoData) {
-        if (item == null || item is! Map<String, dynamic>) continue; // Lewati data invalid
 
-        // Parse 'packages' yang ada di dalam
+      for (var item in mongoData) {
+        if (item == null || item is! Map<String, dynamic>) continue;
+
         List<ServicePackage> packages = [];
         if (item['packages'] is List) {
-           packages = (item['packages'] as List<dynamic>)
+          packages = (item['packages'] as List<dynamic>)
               .map((pkg) => ServicePackage(
                     name: pkg['name'] ?? 'Paket Tanpa Nama',
                     price: (pkg['price'] as num?)?.toDouble() ?? 0.0,
@@ -74,18 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         String serviceType = item['serviceType'] ?? 'Lainnya';
-
-        // Ambil data umum dengan fallback (nilai default jika null)
-        String id = item['_id'] ?? UniqueKey().toString(); // ID unik jika null
+        String id = item['_id'] ?? UniqueKey().toString();
         String name = item['name'] ?? 'Layanan Tanpa Nama';
         double price = (item['price'] as num?)?.toDouble() ?? 0.0;
         String description = item['description'] ?? 'Tanpa Deskripsi';
-        // Beri gambar placeholder jika imageUrl null atau kosong
-        String imageUrl = (item['imageUrl'] != null && item['imageUrl'].isNotEmpty)
-                          ? item['imageUrl']
-                          : 'https://placehold.co/400x300/EADCFB/7E57C2?text=Cozypaws'; // Placeholder
+        String imageUrl = (item['imageUrl'] != null &&
+                item['imageUrl'].isNotEmpty)
+            ? item['imageUrl']
+            : 'https://placehold.co/400x300/EADCFB/7E57C2?text=Cozypaws';
 
-        // Buat object yang sesuai
         if (serviceType == 'Grooming') {
           servicesList.add(Grooming(
             id: id,
@@ -132,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
             packages: packages,
           ));
         }
-        // Tambahkan 'else' jika ada serviceType 'Lainnya'
       }
       return servicesList;
     } catch (e) {
@@ -140,14 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Gagal memuat & mem-parsing data layanan: $e');
     }
   }
-  // --- -------------------------------------------- ---
 
   void _searchService(
     BuildContext context,
     String query,
     List<Service> services,
   ) {
-    // Fungsi search
     final results = services
         .where(
           (service) =>
@@ -171,79 +159,82 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildPage(int index) {
     if (index == 0) {
-      // --- Halaman Home ---
       return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // --- FUTUREBUILDER ---
-            FutureBuilder<List<Service>>( // Ganti ke List<Service>
-              future: _servicesFuture, // Gunakan state future
+            FutureBuilder<List<Service>>(
+              future: _servicesFuture,
               builder: (context, snapshot) {
-                
-                // Saat Loading
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container(
                     height: 500,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: const Center(child: CircularProgressIndicator()),
                   );
                 }
-                
-                // Jika Error
+
                 if (snapshot.hasError) {
                   return Container(
                     height: 500,
-                    child: Center(child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('Gagal memuat data: ${snapshot.error}\n\nCoba restart aplikasi.', textAlign: TextAlign.center),
-                    )),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Gagal memuat data: ${snapshot.error}\n\nCoba restart aplikasi.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   );
                 }
-                
-                // Jika Data Kosong
+
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Container(
                     height: 500,
-                    child: Center(child: Text('Belum ada layanan tersedia.')),
+                    child: const Center(
+                      child: Text('Belum ada layanan tersedia.'),
+                    ),
                   );
                 }
 
-                // ✅ Jika Data Ada
                 final List<Service> services = snapshot.data!;
-
-                // --- KODE UI MULAI DARI SINI ---
                 final List<String> categories = [
-                  "Semua", "Grooming", "Boarding", "Vaksinasi", "Pick-up and Drop off",
+                  "Semua",
+                  "Grooming",
+                  "Boarding",
+                  "Vaksinasi",
+                  "Pick-up and Drop off",
                 ];
 
-                // Filter berdasarkan nama layanan (Logic ini tetap aman)
                 List<Service> filteredServices;
                 if (_selectedCategory == "Semua") {
                   filteredServices = services;
                 } else {
                   filteredServices = services.where((service) {
                     final name = service.name.toLowerCase();
-                    final type = (service as dynamic).runtimeType.toString().toLowerCase(); // Trik ambil tipe
+                    final type =
+                        (service as dynamic).runtimeType.toString().toLowerCase();
 
                     if (_selectedCategory == "Grooming") {
                       return name.contains("grooming") || type.contains("grooming");
                     } else if (_selectedCategory == "Boarding") {
                       return name.contains("boarding") || type.contains("boarding");
                     } else if (_selectedCategory == "Vaksinasi") {
-                      return name.contains("vaksinasi") || type.contains("vaksinasi");
+                      return name.contains("vaksinasi") ||
+                          type.contains("vaksinasi");
                     } else if (_selectedCategory == "Pick-up and Drop off") {
-                      return name.contains("antar") || name.contains("jemput") || type.contains("antarjemput");
+                      return name.contains("antar") ||
+                          name.contains("jemput") ||
+                          type.contains("antarjemput");
                     }
                     return false;
                   }).toList();
                 }
 
-                // Return UI kamu (Header, Kategori, List, Accordion)
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Gradient 
+                    // HEADER
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(16, 30, 16, 30),
@@ -272,13 +263,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 6),
                           const Text(
                             "Meowcome di Cozypaws!",
-                            style:
-                                TextStyle(fontSize: 14, color: Colors.white70),
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.white70),
                           ),
                           const SizedBox(height: 20),
-                          // Search bar 
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(30),
@@ -310,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Filter kategori
+                    // KATEGORI
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: SingleChildScrollView(
@@ -357,11 +348,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 12),
 
-                    // --- 🔽 LIST LAYANAN UTAMA 🔽 ---
+                    // LIST LAYANAN
                     ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 20),
                       itemCount: filteredServices.length,
                       itemBuilder: (context, index) {
                         final service = filteredServices[index];
@@ -376,36 +368,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: const EdgeInsets.all(12),
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              // --- PERBAIKAN IMAGE ---
-                              // Gunakan Image.network karena URL dari DB
-                              child: Image.network( 
-                                service.imageUrl, // imageUrl sekarang adalah URL
+                              child: Image.network(
+                                service.imageUrl,
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
-                                // Tampilkan loading
                                 loadingBuilder: (context, child, progress) {
                                   return progress == null
                                       ? child
-                                      : Center(child: CircularProgressIndicator(strokeWidth: 2));
+                                      : const Center(
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2));
                                 },
-                                // Tampilkan ikon jika error (URL salah/null)
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                      width: 100,
-                                      height: 100,
-                                      color: Colors.grey[200],
-                                      child: const Icon(
-                                        Icons.pets_outlined, // Ikon cadangan
-                                        size: 40,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
+                                errorBuilder:
+                                    (context, error, stackTrace) =>
+                                        Container(
+                                  width: 100,
+                                  height: 100,
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.pets_outlined,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                               ),
-                              // --- BATAS PERBAIKAN IMAGE ---
                             ),
                             title: Text(
-                              service.name, 
+                              service.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
@@ -413,14 +403,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              service.description, 
+                              service.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                   fontSize: 10, color: Colors.black),
                             ),
                             trailing: Text(
-                              "Mulai dari\n${FormatUtils.rupiah(service.price)}", 
+                              "Mulai dari\n${FormatUtils.rupiah(service.price)}",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
@@ -440,11 +430,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    // --- --------------------------------- ---
 
                     const SizedBox(height: 8),
 
-                    // "Mengapa Memilih Kami"
+                    // ACCORDION
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 8),
@@ -652,6 +641,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       contentPadding: const EdgeInsets.all(12),
                           ),
                          ),
+                          _accordion(
+                            'Tenaga Profesional & Bersertifikat',
+                            'Setiap layanan dilakukan oleh dokter hewan dan groomer berpengalaman yang memahami kebutuhan hewan peliharaan dengan baik.',
+                          ),
+
+                          _accordion(
+                            'Fasilitas Bersih & Nyaman',
+                            'Cozypaws menyediakan ruang perawatan ber-AC, area bermain yang aman, dan peralatan steril untuk menjaga kesehatan hewan.',
+                          ),
+
+                          _accordion(
+                            'Layanan Lengkap dalam Satu Tempat',
+                            'Dari grooming, boarding, hingga vaksinasi — semua kebutuhan hewan peliharaan tersedia di satu tempat.',
+                          ),
+
+                          _accordion(
+                            'Pelayanan Ramah & Cepat Tanggap',
+                            'Cozypaws siap membantu dengan pelayanan cepat dan ramah agar pawrent merasa tenang.',
+                          ),
+
+                          _accordion(
+                            'Layanan Antar-Jemput',
+                            'Cozypaws menawarkan layanan antar-jemput untuk mempermudah pawrent melakukan perawatan tanpa harus datang ke lokasi.',
+                          ),
                         ],
                       ),
                     ),
@@ -663,15 +676,54 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } else if (index == 1) {
-      return const ServiceScreen(); // Halaman Service 
+      return const ServiceScreen();
     } else {
-      return const ProfileScreen(); // Halaman Profile 
+      return const ProfileScreen();
     }
+  }
+
+  Widget _accordion(String title, String content) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: GFAccordion(
+        title: title,
+        contentChild: Text(
+          content,
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.purple,
+            height: 1.4,
+          ),
+        ),
+        textStyle: const TextStyle(fontSize: 11, color: Colors.black),
+        expandedTitleBackgroundColor:
+            const Color.fromARGB(255, 241, 222, 245),
+        collapsedIcon:
+            const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+        expandedIcon:
+            const Icon(Icons.keyboard_arrow_up, color: Colors.black),
+        titleBorderRadius: BorderRadius.circular(10),
+        titlePadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        contentPadding: const EdgeInsets.all(12),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fungsi build() utama 
     return Scaffold(
       body: _buildPage(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
