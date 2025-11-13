@@ -3,10 +3,11 @@ import '../../services/auth_service.dart';
 import '../../models/user.dart';
 
 // Halaman-halaman yang akan diakses dari drawer
-import 'service_management_page.dart';
+import 'service_management_page.dart'; 
 import 'user_management_page.dart';
 import 'order_management_page.dart';
-import '../home_screen.dart';
+import 'staff_management_page.dart'; // <-- 1. IMPORT MENU STAF
+import '../home_screen.dart'; 
 import '../login_screen.dart';
 
 class AdminPage extends StatefulWidget {
@@ -17,10 +18,12 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
-  final AuthService authService = AuthService();
+  // Gunakan instance AuthService dari constructor agar Dio Interceptor aktif
+  final AuthService authService = AuthService(); 
   User? _currentUser;
   late Future<int> _totalUsersFuture;
   late Future<int> _totalOrdersFuture;
+  late Future<int> _totalStaffFuture; // <-- 2. TAMBAHAN UNTUK DASHBOARD
 
   @override
   void initState() {
@@ -40,6 +43,7 @@ class _AdminPageState extends State<AdminPage> {
     setState(() {
       _totalUsersFuture = authService.getUsers().then((list) => list.length);
       _totalOrdersFuture = authService.getOrders().then((list) => list.length);
+      _totalStaffFuture = authService.getStaff().then((list) => list.length); // <-- 3. AMBIL DATA STAF
     });
   }
 
@@ -60,8 +64,8 @@ class _AdminPageState extends State<AdminPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent, // Transparan agar gradient terlihat
+        foregroundColor: Colors.white, // Warna ikon (menu)
         title: const Text(
           'Dashboard',
           style: TextStyle(
@@ -70,12 +74,12 @@ class _AdminPageState extends State<AdminPage> {
           ),
         ),
         centerTitle: false,
-        flexibleSpace: Container(
+        flexibleSpace: Container( // Latar belakang gradient
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFFF48FB1),
-                Color(0xFF7E57C2),
+                Color(0xFFF48FB1), // Pink
+                Color(0xFF7E57C2), // Ungu
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -91,7 +95,7 @@ class _AdminPageState extends State<AdminPage> {
         ],
       ),
 
-      drawer: _buildAdminDrawer(context),
+      drawer: _buildAdminDrawer(context), // Panggil sidebar
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -109,6 +113,8 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // --- WIDGET DASHBOARD ---
+
   Widget _buildOverviewSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,25 +124,26 @@ class _AdminPageState extends State<AdminPage> {
           children: [
             const Text('Overview', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             DropdownButton<String>(
-            value: 'All time',
-            items: <String>['All time', 'Last 7 days', 'Last 30 days']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 14,      
-                    color: Colors.black,
+              value: 'All time',
+              items: <String>['All time', 'Last 7 days', 'Last 30 days']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14, 
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {},
-          )
+                );
+              }).toList(),
+              onChanged: (String? newValue) {},
+            )
           ],
         ),
         const SizedBox(height: 15),
+        // Kartu baris pertama
         Row(
           children: [
             Expanded(
@@ -162,6 +169,24 @@ class _AdminPageState extends State<AdminPage> {
             ),
           ],
         ),
+        const SizedBox(height: 15),
+        // Kartu baris kedua (Staf)
+        Row(
+           children: [
+            Expanded(
+              child: _buildInfoCard(
+                context: context,
+                title: 'Staf',
+                valueFuture: _totalStaffFuture, // <-- 4. TAMPILKAN KARTU STAF
+                change: '+0%',
+                isPositive: true,
+                icon: Icons.badge_outlined, // Ikon staf
+              ),
+            ),
+             const SizedBox(width: 15),
+             Expanded(child: Container()), // Spacer
+           ],
+        )
       ],
     );
   }
@@ -174,6 +199,7 @@ class _AdminPageState extends State<AdminPage> {
     required bool isPositive,
     required IconData icon,
   }) {
+    // ... (Kode widget ini tidak berubah) ...
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -195,7 +221,11 @@ class _AdminPageState extends State<AdminPage> {
               future: valueFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(strokeWidth: 2);
+                  return const SizedBox(
+                    height: 28, 
+                    width: 28,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  );
                 }
                 if (snapshot.hasError) {
                   return const Text('Error', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold));
@@ -238,6 +268,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildWelcomeMessage() {
+    // ... (Kode widget ini tidak berubah) ...
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -273,6 +304,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildUserSummarySection() {
+    // ... (Kode widget ini tidak berubah) ...
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -342,7 +374,8 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildUserAvatar({required String name, required String email}) {
-    return Column(
+    // ... (Kode widget ini tidak berubah) ...
+     return Column(
       children: [
         CircleAvatar(
           radius: 25,
@@ -358,6 +391,7 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // --- 🔽 WIDGET SIDEBAR (DRAWER) DIPERBARUI 🔽 ---
   Widget _buildAdminDrawer(BuildContext context) {
     return Drawer(
       child: ListView(
@@ -395,15 +429,17 @@ class _AdminPageState extends State<AdminPage> {
             ),
           ),
 
+          // Menu 1: Dashboard
           ListTile(
             leading: const Icon(Icons.dashboard_outlined, color: Colors.deepPurple),
             title: const Text('Dashboard'),
-            tileColor: Colors.deepPurple[50],
+            tileColor: Colors.deepPurple[50], // Tandai halaman aktif
             onTap: () {
               Navigator.pop(context);
             },
           ),
 
+          // Menu 2: Manajemen Layanan
           ListTile(
             leading: const Icon(Icons.storefront_outlined, color: Colors.black54),
             title: const Text('Manajemen Layanan'),
@@ -416,6 +452,7 @@ class _AdminPageState extends State<AdminPage> {
             },
           ),
 
+          // Menu 3: Manajemen Pesanan
           ListTile(
             leading: const Icon(Icons.receipt_long_outlined, color: Colors.black54),
             title: const Text('Manajemen Pesanan'),
@@ -428,6 +465,7 @@ class _AdminPageState extends State<AdminPage> {
             },
           ),
 
+          // Menu 4: Manajemen Pengguna
           ListTile(
             leading: const Icon(Icons.manage_accounts_outlined, color: Colors.black54),
             title: const Text('Manajemen Pengguna'),
@@ -440,8 +478,23 @@ class _AdminPageState extends State<AdminPage> {
             },
           ),
 
+          // --- 5. TAMBAHKAN LISTTILE STAF DI SINI ---
+          ListTile(
+            leading: const Icon(Icons.badge_outlined, color: Colors.black54), // Ikon untuk staf
+            title: const Text('Manajemen Staf'),
+            onTap: () {
+              Navigator.pop(context); // Tutup drawer dulu
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StaffManagementPage()),
+              );
+            },
+          ),
+          // -----------------------------------------
+
           const Divider(),
 
+          // Menu Kembali ke Home
           ListTile(
             leading: const Icon(Icons.home_outlined, color: Colors.black54),
             title: const Text('Kembali ke Home'),
@@ -457,6 +510,7 @@ class _AdminPageState extends State<AdminPage> {
             },
           ),
 
+          // Menu Logout
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.redAccent),
             title: const Text('Logout'),

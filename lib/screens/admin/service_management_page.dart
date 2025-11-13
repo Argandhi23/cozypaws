@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
-import '../../utils/format_utils.dart'; // Import FormatUtils
+import '../../utils/format_utils.dart';
+import '../package_manajemen_page.dart'; // Import FormatUtils
+
 
 class ServiceManagementPage extends StatefulWidget {
   const ServiceManagementPage({Key? key}) : super(key: key);
@@ -29,7 +31,6 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
 
   // --- Dialog Tambah Layanan ---
   void _tampilkanDialogTambah() {
-    // ... (Kode dialog ini sudah cukup baik, tidak perlu diubah signifikan) ...
     final TextEditingController nameController = TextEditingController();
     final TextEditingController priceController = TextEditingController();
     final TextEditingController descController = TextEditingController();
@@ -42,7 +43,7 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
         return StatefulBuilder(
           builder: (context, setStateInDialog) {
             return AlertDialog(
-              title: Text('Tambah Layanan Baru'),
+              title: Text('Tambah Kategori Layanan'), // Judul diubah
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -50,7 +51,7 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
                     DropdownButtonFormField<String>(
                       value: selectedServiceType,
                       decoration: InputDecoration(labelText: 'Tipe Layanan'),
-                      items: ['Grooming', 'Boarding', 'Vaksinasi', 'AntarJemput']
+                      items: ['Grooming', 'Boarding', 'Vaksinasi', 'AntarJemput', 'Lainnya'] // Tambah 'Lainnya'
                           .map((String value) {
                         return DropdownMenuItem<String>(value: value, child: Text(value));
                       }).toList(),
@@ -58,14 +59,14 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
                         setStateInDialog(() { selectedServiceType = newValue!; });
                       },
                     ),
-                    TextField(controller: nameController, decoration: InputDecoration(labelText: 'Nama Layanan')),
+                    TextField(controller: nameController, decoration: InputDecoration(labelText: 'Nama Kategori (cth: Grooming)')),
                     TextField(
                       controller: priceController,
-                      decoration: InputDecoration(labelText: 'Harga Dasar'),
+                      decoration: InputDecoration(labelText: 'Harga Dasar (cth: 45000)'),
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                     ),
                     TextField(controller: descController, decoration: InputDecoration(labelText: 'Deskripsi'), maxLines: 3),
-                    TextField(controller: imageUrlController, decoration: InputDecoration(labelText: 'URL Gambar (opsional)')),
+                    TextField(controller: imageUrlController, decoration: InputDecoration(labelText: 'URL Gambar (Wajib diisi)')),
                   ],
                 ),
               ),
@@ -73,21 +74,24 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
                 TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Batal')),
                 ElevatedButton(
                   onPressed: () async {
+                    // Validasi
+                    if (nameController.text.trim().isEmpty || 
+                        descController.text.trim().isEmpty ||
+                        imageUrlController.text.trim().isEmpty) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text('Semua field wajib diisi!'), backgroundColor: Colors.red),
+                       );
+                       return;
+                    }
+
                     Map<String, dynamic> newServiceData = {
                       'serviceType': selectedServiceType,
-                      'name': nameController.text.trim(), // Trim spasi
+                      'name': nameController.text.trim(),
                       'price': double.tryParse(priceController.text) ?? 0.0,
-                      'description': descController.text.trim(), // Trim spasi
-                      'imageUrl': imageUrlController.text.trim().isNotEmpty ? imageUrlController.text.trim() : null,
-                      'packages': [],
+                      'description': descController.text.trim(),
+                      'imageUrl': imageUrlController.text.trim(),
+                      'packages': [], // Paket ditambahkan nanti lewat 'Kelola Paket'
                     };
-                     // Validasi nama tidak boleh kosong
-                    if (newServiceData['name'].isEmpty) {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                           SnackBar(content: Text('Nama layanan tidak boleh kosong!'), backgroundColor: Colors.red),
-                       );
-                       return; // Hentikan proses jika nama kosong
-                    }
 
                     try {
                       await authService.addService(newServiceData);
@@ -117,64 +121,90 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
 
   // --- Dialog Update Layanan ---
   void _tampilkanDialogUpdate(Map<String, dynamic> service) {
-    // ... (Kode dialog ini sudah cukup baik, tidak perlu diubah signifikan) ...
+    // Dialog ini HANYA mengupdate info dasar (Nama, Harga, Deskripsi, URL)
+    // BUKAN mengupdate 'packages'
     final String id = service['_id'];
     final TextEditingController nameController = TextEditingController(text: service['name'] ?? '');
     final TextEditingController priceController = TextEditingController(text: service['price']?.toString() ?? '0');
-    // TODO: Tambahkan controller lain jika perlu update deskripsi, tipe, imageUrl, dll.
+    final TextEditingController descController = TextEditingController(text: service['description'] ?? '');
+    final TextEditingController imageUrlController = TextEditingController(text: service['imageUrl'] ?? '');
+    String selectedServiceType = service['serviceType'] ?? 'Grooming';
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('Update Layanan'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: nameController, decoration: InputDecoration(labelText: 'Nama Layanan')),
-              TextField(
-                controller: priceController,
-                decoration: InputDecoration(labelText: 'Harga Dasar'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+        return StatefulBuilder( // Tambahkan StatefulBuilder
+          builder: (context, setStateInDialog) {
+            return AlertDialog(
+              title: Text('Update Layanan Utama'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                     DropdownButtonFormField<String>(
+                      value: selectedServiceType,
+                      decoration: InputDecoration(labelText: 'Tipe Layanan'),
+                      items: ['Grooming', 'Boarding', 'Vaksinasi', 'AntarJemput', 'Lainnya']
+                          .map((String value) {
+                        return DropdownMenuItem<String>(value: value, child: Text(value));
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setStateInDialog(() { selectedServiceType = newValue!; });
+                      },
+                    ),
+                    TextField(controller: nameController, decoration: InputDecoration(labelText: 'Nama Layanan')),
+                    TextField(
+                      controller: priceController,
+                      decoration: InputDecoration(labelText: 'Harga Dasar'),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    TextField(controller: descController, decoration: InputDecoration(labelText: 'Deskripsi'), maxLines: 3),
+                    TextField(controller: imageUrlController, decoration: InputDecoration(labelText: 'URL Gambar')),
+                  ],
+                ),
               ),
-               // TODO: Tambahkan field lain di sini
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Batal')),
-            ElevatedButton(
-              onPressed: () async {
-                Map<String, dynamic> updatedData = {
-                  'name': nameController.text.trim(), // Trim spasi
-                  'price': double.tryParse(priceController.text) ?? 0.0,
-                   // TODO: Tambahkan data lain yang diupdate
-                };
-                 // Validasi nama tidak boleh kosong
-                if (updatedData['name'].isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(content: Text('Nama layanan tidak boleh kosong!'), backgroundColor: Colors.red),
-                    );
-                    return; // Hentikan proses
-                }
+              actions: [
+                TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Batal')),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (nameController.text.trim().isEmpty || 
+                        descController.text.trim().isEmpty ||
+                        imageUrlController.text.trim().isEmpty) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text('Semua field wajib diisi!'), backgroundColor: Colors.red),
+                       );
+                       return;
+                    }
 
-                try {
-                  await authService.updateService(id, updatedData);
-                  Navigator.of(context).pop();
-                  _muatLayanan();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Layanan berhasil diperbarui!'), backgroundColor: Colors.green),
-                  );
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Gagal update: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                }
-              },
-              child: Text('Update'),
-            ),
-          ],
+                    Map<String, dynamic> updatedData = {
+                      'serviceType': selectedServiceType,
+                      'name': nameController.text.trim(),
+                      'price': double.tryParse(priceController.text) ?? 0.0,
+                      'description': descController.text.trim(),
+                      'imageUrl': imageUrlController.text.trim(),
+                      // Kita tidak mengirim 'packages' di sini agar tidak terhapus
+                    };
+
+                    try {
+                      await authService.updateService(id, updatedData);
+                      Navigator.of(context).pop();
+                      _muatLayanan();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Layanan berhasil diperbarui!'), backgroundColor: Colors.green),
+                      );
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Gagal update: $e'), backgroundColor: Colors.red),
+                        );
+                      }
+                    }
+                  },
+                  child: Text('Update'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -183,13 +213,12 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
 
   // --- Dialog Hapus Layanan ---
   void _tampilkanDialogHapus(String id, String serviceName) {
-    // ... (Kode dialog ini sudah cukup baik, tidak perlu diubah signifikan) ...
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Hapus Layanan?'),
-          content: Text('Apakah kamu yakin ingin menghapus layanan "$serviceName"?'),
+          content: Text('Apakah kamu yakin ingin menghapus layanan "$serviceName" DAN SEMUA PAKET di dalamnya?'), // Peringatan baru
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Batal')),
             ElevatedButton(
@@ -222,7 +251,7 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
   // Helper untuk mendapatkan ikon berdasarkan tipe layanan
   IconData _getServiceIcon(String? serviceType) {
     switch (serviceType) {
-      case 'Grooming': return Icons.content_cut_outlined; // Gunakan ikon outline
+      case 'Grooming': return Icons.content_cut_outlined;
       case 'Boarding': return Icons.hotel_outlined;
       case 'Vaksinasi': return Icons.local_hospital_outlined;
       case 'AntarJemput': return Icons.local_shipping_outlined;
@@ -235,28 +264,28 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      elevation: 0,
-      foregroundColor: Colors.white,
-      title: Text(
-        'Manajemen Layanan',
-        style: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 20,
+        elevation: 0,
+        foregroundColor: Colors.white,
+        title: Text(
+          'Manajemen Layanan',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 20,
+          ),
         ),
-      ),
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFF48FB1),
-              Color(0xFF7E57C2),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFF48FB1),
+                Color(0xFF7E57C2),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
         ),
       ),
-    ),
       // Gunakan RefreshIndicator
       body: RefreshIndicator(
         onRefresh: _muatLayanan, // Panggil fungsi muat ulang saat ditarik
@@ -267,7 +296,6 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
               return Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              // Tampilkan pesan error yang lebih user-friendly
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -277,7 +305,16 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
-                child: Text('Belum ada layanan di database.\nTekan tombol + untuk menambah.')
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.storefront_outlined, size: 80, color: Colors.grey[300]),
+                    SizedBox(height: 16),
+                    Text('Belum ada layanan di database.'),
+                    SizedBox(height: 16),
+                    Text('Tekan tombol + untuk menambah kategori layanan.'),
+                  ],
+                )
               );
             }
 
@@ -291,7 +328,9 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
                 final String id = service['_id'] ?? ''; // Handle null ID
                 final String serviceName = service['name'] ?? 'Tanpa Nama';
                 final String serviceType = service['serviceType'] ?? 'Lainnya';
-                final double price = (service['price'] as num?)?.toDouble() ?? 0.0; // Konversi aman
+                final double price = (service['price'] as num?)?.toDouble() ?? 0.0;
+                // --- 2. HITUNG JUMLAH PAKET ---
+                final int packageCount = (service['packages'] as List<dynamic>?)?.length ?? 0;
 
                 return ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Atur padding
@@ -306,44 +345,58 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
                     serviceName,
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)
                   ),
+                  // --- 3. TAMPILKAN JUMLAH PAKET ---
                   subtitle: Text(
-                    'Harga Dasar: ${FormatUtils.rupiah(price)}', // Gunakan FormatUtils
-                    style: TextStyle(fontSize: 13, color: Colors.black54)
+                    'Harga Dasar: ${FormatUtils.rupiah(price)}\n'
+                    'Jumlah Paket: $packageCount', // <-- Tampilkan di sini
+                     style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.3)
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Tombol Edit
+                      // --- 4. TOMBOL BARU "KELOLA PAKET" ---
+                      IconButton(
+                        icon: Icon(Icons.inventory_2_outlined, color: Colors.green[700]),
+                        tooltip: 'Kelola Paket (cth: Kitty Fresh)',
+                        onPressed: () {
+                          // Navigasi ke halaman baru
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              // Kirim data 'service' lengkap ke halaman baru
+                              builder: (context) => PackageManagementPage(service: service),
+                            ),
+                          ).then((_) {
+                             // Setelah kembali dari halaman paket,
+                             // muat ulang data untuk update 'Jumlah Paket'
+                            _muatLayanan(); 
+                          });
+                        },
+                         visualDensity: VisualDensity.compact,
+                      ),
+                      // ---------------------------------
+
+                      // Tombol Edit (Edit Layanan Utama)
                       IconButton(
                         icon: Icon(Icons.edit_outlined, color: Colors.blueAccent),
-                        tooltip: 'Edit Layanan',
+                        tooltip: 'Edit Layanan (Nama, Harga Dasar)',
                         onPressed: () {
-                          // Pastikan ID tidak kosong sebelum edit
                           if (id.isNotEmpty) {
                              _tampilkanDialogUpdate(service);
-                          } else {
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(content: Text('Error: ID Layanan tidak valid.'), backgroundColor: Colors.red),
-                             );
-                          }
+                          } else { /* ... (error snackbar) ... */ }
                         },
-                         visualDensity: VisualDensity.compact, // Perkecil tombol
+                         visualDensity: VisualDensity.compact, 
                       ),
-                      // Tombol Delete
+                      // Tombol Delete (Hapus Layanan Utama)
                       IconButton(
                         icon: Icon(Icons.delete_outline, color: Colors.redAccent),
-                        tooltip: 'Hapus Layanan',
+                        tooltip: 'Hapus Kategori Layanan',
                         onPressed: () {
-                          // Pastikan ID tidak kosong sebelum hapus
                           if (id.isNotEmpty) {
                              _tampilkanDialogHapus(id, serviceName);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(content: Text('Error: ID Layanan tidak valid.'), backgroundColor: Colors.red),
-                             );
-                          }
+                          } else { /* ... (error snackbar) ... */ }
                         },
-                         visualDensity: VisualDensity.compact, // Perkecil tombol
+                         visualDensity: VisualDensity.compact,
                       ),
                     ],
                   ),
@@ -357,7 +410,7 @@ class _ServiceManagementPageState extends State<ServiceManagementPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _tampilkanDialogTambah,
         child: Icon(Icons.add),
-        tooltip: 'Tambah Layanan Baru',
+        tooltip: 'Tambah Kategori Layanan Baru', // Tooltip diubah
         backgroundColor: Colors.deepPurple,
       ),
     );
